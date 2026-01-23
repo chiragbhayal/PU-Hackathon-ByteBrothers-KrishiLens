@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "802235732793",
+    "project_id": "krishilens-2c868",
+    "storage_bucket": "krishilens-2c868.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802235732793:android:2b7637444b3564d9c2cee8",
+        "android_client_info": {
+          "package_name": "com.company.KrishiLens"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIxZp5o2zyA77yYPRqJHvneUDyJxnBmxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
