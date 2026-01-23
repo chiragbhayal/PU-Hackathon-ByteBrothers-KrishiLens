@@ -23,10 +23,10 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>{t('welcomeBack2')}</Text>
-          <Text style={styles.userEmail}>{user?.email}</Text>
+          <Text style={styles.userEmail}>{user?.displayName || user?.email?.split('@')[0] || 'User'}</Text>
         </View>
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
+        <TouchableOpacity onPress={() => router.push('/profile')} style={styles.logoutButton}>
+          <Ionicons name="person-outline" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 

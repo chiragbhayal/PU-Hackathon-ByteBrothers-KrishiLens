@@ -91,6 +91,22 @@ export default function ResultScreen() {
           <Text style={styles.treatmentText}>{treatment}</Text>
         </View>
 
+        <View style={styles.whyCard}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="help-circle" size={24} color="#2196F3" />
+            <Text style={styles.cardTitle}>Why This Happens</Text>
+          </View>
+          <Text style={styles.whyText}>This condition typically occurs due to environmental factors, nutrient deficiencies, or pathogen infections. Poor drainage, excessive moisture, or inadequate nutrition can create favorable conditions for disease development.</Text>
+        </View>
+
+        <View style={styles.actionCard}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="checkmark-circle" size={24} color="#FF9800" />
+            <Text style={styles.cardTitle}>What to Do Next</Text>
+          </View>
+          <Text style={styles.actionText}>1. Apply the recommended treatment immediately{"\n"}2. Monitor the affected area daily{"\n"}3. Improve drainage and air circulation{"\n"}4. Consider preventive measures for future crops{"\n"}5. Consult an agricultural expert if symptoms persist</Text>
+        </View>
+
         <View style={styles.actions}>
           <TouchableOpacity 
             style={styles.primaryButton}
@@ -263,6 +279,38 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   treatmentText: {
+    fontSize: 16,
+    color: '#1B5E20',
+    lineHeight: 24,
+  },
+  whyCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  whyText: {
+    fontSize: 16,
+    color: '#1B5E20',
+    lineHeight: 24,
+  },
+  actionCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  actionText: {
     fontSize: 16,
     color: '#1B5E20',
     lineHeight: 24,

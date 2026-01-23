@@ -7,6 +7,8 @@ import { useLanguage } from '../contexts/language-context';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,7 +17,7 @@ export default function RegisterScreen() {
   const { t } = useLanguage();
 
   const handleRegister = async () => {
-    if (!email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
@@ -31,7 +33,7 @@ export default function RegisterScreen() {
     }
 
     setLoading(true);
-    const result = await register(email, password);
+    const result = await register(email, password, firstName, lastName);
     setLoading(false);
 
     if (result.success) {
@@ -67,6 +69,30 @@ export default function RegisterScreen() {
       
       <View style={styles.content}>
         <View style={styles.form}>
+          <View style={styles.inputContainer}>
+            <Ionicons name="person-outline" size={20} color="#2E7D32" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              placeholderTextColor="#81C784"
+              value={firstName}
+              onChangeText={setFirstName}
+              autoCapitalize="words"
+            />
+          </View>
+          
+          <View style={styles.inputContainer}>
+            <Ionicons name="person-outline" size={20} color="#2E7D32" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              placeholderTextColor="#81C784"
+              value={lastName}
+              onChangeText={setLastName}
+              autoCapitalize="words"
+            />
+          </View>
+          
           <View style={styles.inputContainer}>
             <Ionicons name="mail-outline" size={20} color="#2E7D32" style={styles.inputIcon} />
             <TextInput

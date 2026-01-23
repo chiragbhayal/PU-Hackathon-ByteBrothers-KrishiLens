@@ -1,14 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useAuth } from '../contexts/auth-context';
 import { useLanguage } from '../contexts/language-context';
 import { Ionicons } from '@expo/vector-icons';
+import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 export default function DashboardScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const [recentScans, setRecentScans] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const q = query(
+      collection(db, 'scans'),
+      where('userId', '==', user.uid),
+      orderBy('timestamp', 'desc'),
+      limit(3)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const scans = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setRecentScans(scans);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const getTimeAgo = (timestamp) => {
+    const now = new Date();
+    const scanTime = timestamp.toDate();
+    const diffMs = now - scanTime;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffDays > 0) {
+      return `${diffDays} ${diffDays === 1 ? t('dayAgo') : t('daysAgo')}`;
+    } else if (diffHours > 0) {
+      return `${diffHours} ${diffHours === 1 ? t('hourAgo') : t('hoursAgo')}`;
+    } else {
+      return t('justNow');
+    }
+  };
 
   return (
     <LinearGradient 
@@ -27,25 +67,40 @@ export default function DashboardScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('recentActivity')}</Text>
           
-          <View style={styles.activityCard}>
-            <View style={styles.activityIcon}>
-              <Ionicons name="leaf" size={24} color="#FFFFFF" />
+          {recentScans.length > 0 ? (
+            recentScans.map((scan) => (
+              <View key={scan.id} style={styles.activityCard}>
+                <View style={[
+                  styles.activityIcon,
+                  { backgroundColor: scan.result?.severity === 'high' ? '#FF5722' : scan.result?.severity === 'moderate' ? '#FF9800' : '#2E7D32' }
+                ]}>
+                  <Ionicons 
+                    name={scan.result?.severity === 'high' ? 'warning' : 'leaf'} 
+                    size={24} 
+                    color="#FFFFFF" 
+                  />
+                </View>
+                <View style={styles.activityContent}>
+                  <Text style={styles.activityTitle}>
+                    {scan.result?.disease || t('cropAnalysisComplete')}
+                  </Text>
+                  <Text style={styles.activitySubtitle}>
+                    {getTimeAgo(scan.timestamp)}
+                  </Text>
+                </View>
+              </View>
+            ))
+          ) : (
+            <View style={styles.activityCard}>
+              <View style={styles.activityIcon}>
+                <Ionicons name="leaf" size={24} color="#FFFFFF" />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>{t('noRecentActivity')}</Text>
+                <Text style={styles.activitySubtitle}>{t('startScanning')}</Text>
+              </View>
             </View>
-            <View style={styles.activityContent}>
-              <Text style={styles.activityTitle}>{t('cropAnalysisComplete')}</Text>
-              <Text style={styles.activitySubtitle}>2 {t('hoursAgo')}</Text>
-            </View>
-          </View>
-
-          <View style={styles.activityCard}>
-            <View style={[styles.activityIcon, { backgroundColor: '#FF9800' }]}>
-              <Ionicons name="warning" size={24} color="#FFFFFF" />
-            </View>
-            <View style={styles.activityContent}>
-              <Text style={styles.activityTitle}>{t('diseaseDetected')}</Text>
-              <Text style={styles.activitySubtitle}>1 {t('dayAgo')}</Text>
-            </View>
-          </View>
+          )}
         </View>
 
         <View style={styles.section}>

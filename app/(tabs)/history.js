@@ -9,7 +9,10 @@ import { db } from '../../config/firebase';
 
 export default function HistoryScreen() {
   const [scans, setScans] = useState([]);
+  const [filteredScans, setFilteredScans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [showFilters, setShowFilters] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -27,6 +30,7 @@ export default function HistoryScreen() {
         scanData.push({ id: doc.id, ...doc.data() });
       });
       setScans(scanData);
+      setFilteredScans(scanData);
       setLoading(false);
     });
 
@@ -43,6 +47,56 @@ export default function HistoryScreen() {
     if (confidence >= 80) return '#4CAF50';
     if (confidence >= 60) return '#FF9800';
     return '#F44336';
+  };
+
+  const filterScans = (filterType) => {
+    setSelectedFilter(filterType);
+    let filtered = scans;
+    
+    switch (filterType) {
+      case 'high':
+        filtered = scans.filter(scan => scan.result.severity?.toLowerCase() === 'high');
+        break;
+      case 'moderate':
+        filtered = scans.filter(scan => scan.result.severity?.toLowerCase() === 'moderate');
+        break;
+      case 'low':
+        filtered = scans.filter(scan => scan.result.severity?.toLowerCase() === 'low');
+        break;
+      case 'recent':
+        filtered = scans.filter(scan => {
+          const scanDate = scan.timestamp?.toDate ? scan.timestamp.toDate() : new Date(scan.timestamp);
+          const daysDiff = (new Date() - scanDate) / (1000 * 60 * 60 * 24);
+          return daysDiff <= 7;
+        });
+        break;
+      case 'today':
+        filtered = scans.filter(scan => {
+          const scanDate = scan.timestamp?.toDate ? scan.timestamp.toDate() : new Date(scan.timestamp);
+          const today = new Date();
+          return scanDate.toDateString() === today.toDateString();
+        });
+        break;
+      case 'week':
+        filtered = scans.filter(scan => {
+          const scanDate = scan.timestamp?.toDate ? scan.timestamp.toDate() : new Date(scan.timestamp);
+          const daysDiff = (new Date() - scanDate) / (1000 * 60 * 60 * 24);
+          return daysDiff <= 7;
+        });
+        break;
+      case 'month':
+        filtered = scans.filter(scan => {
+          const scanDate = scan.timestamp?.toDate ? scan.timestamp.toDate() : new Date(scan.timestamp);
+          const daysDiff = (new Date() - scanDate) / (1000 * 60 * 60 * 24);
+          return daysDiff <= 30;
+        });
+        break;
+      default:
+        filtered = scans;
+    }
+    
+    setFilteredScans(filtered);
+    setShowFilters(false);
   };
 
   const renderScanItem = ({ item }) => (
@@ -94,13 +148,68 @@ export default function HistoryScreen() {
           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.title}>Scan History</Text>
-        <View style={styles.placeholder} />
+        <TouchableOpacity onPress={() => setShowFilters(!showFilters)} style={styles.filterButton}>
+          <Ionicons name="filter" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>{scans.length} scans</Text>
+        <Text style={styles.subtitle}>{filteredScans.length} scans</Text>
+        
+        {showFilters && (
+          <View style={styles.filterContainer}>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedFilter === 'all' && styles.activeFilter]}
+              onPress={() => filterScans('all')}
+            >
+              <Text style={[styles.filterText, selectedFilter === 'all' && styles.activeFilterText]}>All</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedFilter === 'high' && styles.activeFilter]}
+              onPress={() => filterScans('high')}
+            >
+              <Text style={[styles.filterText, selectedFilter === 'high' && styles.activeFilterText]}>High Severity</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedFilter === 'moderate' && styles.activeFilter]}
+              onPress={() => filterScans('moderate')}
+            >
+              <Text style={[styles.filterText, selectedFilter === 'moderate' && styles.activeFilterText]}>Moderate</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedFilter === 'low' && styles.activeFilter]}
+              onPress={() => filterScans('low')}
+            >
+              <Text style={[styles.filterText, selectedFilter === 'low' && styles.activeFilterText]}>Low Severity</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedFilter === 'recent' && styles.activeFilter]}
+              onPress={() => filterScans('recent')}
+            >
+              <Text style={[styles.filterText, selectedFilter === 'recent' && styles.activeFilterText]}>Recent</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedFilter === 'today' && styles.activeFilter]}
+              onPress={() => filterScans('today')}
+            >
+              <Text style={[styles.filterText, selectedFilter === 'today' && styles.activeFilterText]}>Today</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedFilter === 'week' && styles.activeFilter]}
+              onPress={() => filterScans('week')}
+            >
+              <Text style={[styles.filterText, selectedFilter === 'week' && styles.activeFilterText]}>This Week</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedFilter === 'month' && styles.activeFilter]}
+              onPress={() => filterScans('month')}
+            >
+              <Text style={[styles.filterText, selectedFilter === 'month' && styles.activeFilterText]}>This Month</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
-      {scans.length === 0 ? (
+      {filteredScans.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="time-outline" size={64} color="#81C784" />
           <Text style={styles.emptyTitle}>No scans yet</Text>
@@ -115,7 +224,7 @@ export default function HistoryScreen() {
         </View>
       ) : (
         <FlatList
-          data={scans}
+          data={filteredScans}
           renderItem={renderScanItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
@@ -154,6 +263,41 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 40,
+  },
+  filterButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    gap: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderWidth: 1,
+    borderColor: '#C8E6C9',
+  },
+  activeFilter: {
+    backgroundColor: '#2E7D32',
+    borderColor: '#2E7D32',
+  },
+  filterText: {
+    fontSize: 12,
+    color: '#1B5E20',
+    fontWeight: '500',
+  },
+  activeFilterText: {
+    color: '#FFFFFF',
   },
   content: {
     flex: 1,

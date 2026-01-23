@@ -74,12 +74,23 @@ export default function ScanScreen() {
 
       const analysisResult = result.data;
 
-      // Save to Firestore
+      // Save to Firestore with enhanced data
       await addDoc(collection(db, 'scans'), {
         userId: user.uid,
+        userEmail: user.email,
         imageUri: selectedImage,
-        result: analysisResult,
+        result: {
+          disease: analysisResult.disease,
+          confidence: analysisResult.confidence,
+          recommendation: analysisResult.recommendation,
+          severity: analysisResult.severity,
+          treatment: analysisResult.treatment,
+          why: 'This condition typically occurs due to environmental factors, nutrient deficiencies, or pathogen infections.',
+          whatToDo: '1. Apply recommended treatment immediately\n2. Monitor affected area daily\n3. Improve drainage and air circulation\n4. Consider preventive measures\n5. Consult agricultural expert if needed'
+        },
         timestamp: new Date(),
+        scanId: Date.now().toString(),
+        status: 'completed'
       });
 
       // Navigate to result screen

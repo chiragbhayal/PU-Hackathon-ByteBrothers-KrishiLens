@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useAuth } from '../../contexts/auth-context';
-import { useLanguage } from '../../contexts/language-context';
+import { useAuth } from '../contexts/auth-context';
+import { useLanguage } from '../contexts/language-context';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
@@ -73,7 +73,9 @@ export default function ProfileScreen() {
       style={styles.gradient}
     >
       <View style={styles.header}>
-        <View style={styles.placeholder} />
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
         <Text style={styles.title}>Profile</Text>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
@@ -85,7 +87,7 @@ export default function ProfileScreen() {
           <View style={styles.avatarContainer}>
             <Ionicons name="person" size={48} color="#FFFFFF" />
           </View>
-          <Text style={styles.userName}>{user?.email?.split('@')[0] || 'User'}</Text>
+          <Text style={styles.userName}>{user?.displayName || user?.email?.split('@')[0] || 'User'}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
         </View>
 
@@ -133,8 +135,13 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
   },
-  placeholder: {
+  backButton: {
     width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
