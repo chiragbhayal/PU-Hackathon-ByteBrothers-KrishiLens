@@ -77,6 +77,17 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('support')}</Text>
           
+          <TouchableOpacity style={styles.settingItem} onPress={() => router.push('/human-safety-line')}>
+            <View style={styles.settingIcon}>
+              <Ionicons name="shield-checkmark-outline" size={24} color="#2E7D32" />
+            </View>
+            <View style={styles.settingContent}>
+              <Text style={styles.settingTitle}>{language === 'hi' ? 'मानव सुरक्षा लाइन' : 'Human Safety Line'}</Text>
+              <Text style={styles.settingSubtitle}>{language === 'hi' ? 'आपातकालीन संपर्क और सुरक्षा' : 'Emergency contacts and safety'}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#666" />
+          </TouchableOpacity>
+          
           <TouchableOpacity style={styles.settingItem} onPress={() => router.push('/help-support')}>
             <View style={styles.settingIcon}>
               <Ionicons name="help-circle-outline" size={24} color="#2E7D32" />

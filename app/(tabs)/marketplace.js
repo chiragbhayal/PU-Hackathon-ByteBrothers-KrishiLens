@@ -77,7 +77,16 @@ export default function MarketplaceScreen() {
               {language === 'hi' ? 'कृषि उत्पाद खरीदें और बेचें' : 'Buy and sell agricultural products'}
             </Text>
           </View>
-          <View style={{ width: 40 }} />
+          <View style={styles.orderCards}>
+            <TouchableOpacity style={styles.buyCard} onPress={() => router.push('/buy-orders')}>
+              <Ionicons name="bag-outline" size={16} color="#4CAF50" />
+              <Text style={styles.cardText}>{language === 'hi' ? 'खरीदें' : 'Buy'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.sellCard} onPress={() => router.push('/sell-orders')}>
+              <Ionicons name="storefront-outline" size={16} color="#FF5722" />
+              <Text style={styles.cardText}>{language === 'hi' ? 'बेचें' : 'Sell'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView style={styles.content}>
@@ -194,5 +203,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#4CAF50',
     marginTop: 4,
+  },
+  orderCards: {
+    flexDirection: 'column',
+    gap: 8,
+  },
+  buyCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+  },
+  sellCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#FF5722',
+  },
+  cardText: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 4,
+    color: '#1B5E20',
   },
 });

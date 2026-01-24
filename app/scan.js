@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/auth-context';
@@ -18,6 +18,11 @@ export default function ScanScreen() {
   const { language } = useLanguage();
   const { updateStats } = useStats();
   const leafAnimation = useRef(new Animated.Value(0)).current;
+  const params = useLocalSearchParams();
+  
+  const selectedCrop = params.selectedCrop;
+  const cropName = params.cropName;
+  const category = params.category;
 
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -257,8 +262,17 @@ export default function ScanScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Scan Crop</Text>
-        <View style={{ width: 40 }} />
+        <View style={styles.headerContent}>
+          <Text style={styles.title}>Scan Crop</Text>
+          {cropName && (
+            <Text style={styles.selectedCrop}>
+              {language === 'hi' ? 'चयनित: ' : 'Selected: '}{cropName}
+            </Text>
+          )}
+        </View>
+        <TouchableOpacity onPress={() => router.push('/crop-selection')} style={styles.changeButton}>
+          <Ionicons name="swap-horizontal" size={20} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
@@ -271,12 +285,22 @@ export default function ScanScreen() {
             >
               <Ionicons name="close-circle" size={32} color="#FF5722" />
             </TouchableOpacity>
+            {cropName && (
+              <View style={styles.cropBadge}>
+                <Text style={styles.cropBadgeText}>{cropName}</Text>
+              </View>
+            )}
           </View>
         ) : (
           <View style={styles.placeholder}>
             <Ionicons name="camera" size={64} color="#81C784" />
             <Text style={styles.placeholderText}>No image selected</Text>
-            <Text style={styles.placeholderSubtext}>Take a photo or select from gallery</Text>
+            <Text style={styles.placeholderSubtext}>
+              {cropName ? 
+                `${language === 'hi' ? 'अपनी' : 'Take photo of your'} ${cropName} ${language === 'hi' ? 'की तस्वीर लें' : 'plant'}` :
+                'Take a photo or select from gallery'
+              }
+            </Text>
           </View>
         )}
 
@@ -358,6 +382,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     letterSpacing: 0.5,
+  },
+  headerContent: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  selectedCrop: {
+    fontSize: 14,
+    color: '#C8E6C9',
+    marginTop: 4,
+    fontWeight: '500',
+  },
+  changeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,
@@ -460,5 +502,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
+  },
+  cropBadge: {
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  cropBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });

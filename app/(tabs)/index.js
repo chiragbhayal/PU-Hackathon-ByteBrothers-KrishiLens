@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { stats } = useStats();
 
   const handleLogout = async () => {
@@ -43,7 +43,7 @@ export default function HomeScreen() {
           
           <TouchableOpacity 
             style={styles.actionCard}
-            onPress={() => router.push('/scan')}
+            onPress={() => router.push('/crop-selection')}
           >
             <View style={[styles.actionIcon, { backgroundColor: '#FF5722' }]}>
               <Ionicons name="camera" size={32} color="#FFFFFF" />

@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { AuthProvider } from '../contexts/auth-context';
 import { LanguageProvider } from '../contexts/language-context';
 import { StatsProvider } from '../contexts/stats-context';
+import FloatingComponent from '../components/FloatingComponent';
 
 export const unstable_settings = {
   initialRouteName: 'index',
@@ -20,6 +21,7 @@ export default function RootLayout() {
             <Stack.Screen name="result" />
             <Stack.Screen name="(tabs)" />
           </Stack>
+          <FloatingComponent />
         </StatsProvider>
       </AuthProvider>
     </LanguageProvider>
