@@ -4,14 +4,53 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import { useLanguage } from '../contexts/language-context';
+import { useNotifications } from '../contexts/notification-context';
 
 export default function ResultScreen() {
   const params = useLocalSearchParams();
   const { imageUri, disease, confidence, recommendation, severity, treatment } = params;
   const { language } = useLanguage();
+  const { addNotification } = useNotifications();
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [translatedContent, setTranslatedContent] = useState(null);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [careChecklist, setCareChecklist] = useState({
+    water: false,
+    sunlight: false,
+    checked: false
+  });
+  const [showCareConfirmation, setShowCareConfirmation] = useState(false);
+  const [careSubmitted, setCareSubmitted] = useState(false);
+
+  const handleCareCheck = (item) => {
+    setCareChecklist({ ...careChecklist, [item]: !careChecklist[item] });
+  };
+
+  const handleCareSubmit = () => {
+    setCareSubmitted(true);
+    setShowCareConfirmation(true);
+    setTimeout(() => setShowCareConfirmation(false), 3000);
+    
+    // Check if water is false and set notification
+    if (!careChecklist.water) {
+      setTimeout(async () => {
+        // Show alert notification
+        Alert.alert(
+          language === 'hi' ? 'पानी की याद' : 'Water Reminder',
+          language === 'hi' ? 'आपके पौधे को पानी की जरूरत हो सकती है। कृपया पानी देना न भूलें।' : 'Your plant might need water. Please don\'t forget to water it.',
+          [{ text: language === 'hi' ? 'ठीक है' : 'OK' }]
+        );
+        
+        // Add to app notifications page
+        addNotification({
+          title: language === 'hi' ? 'पानी की याद' : 'Water Reminder',
+          message: language === 'hi' ? 'आपके पौधे को पानी की जरूरत हो सकती है।' : 'Your plant might need water. Please don\'t forget to water it.',
+          type: 'reminder',
+          icon: 'water-outline'
+        });
+      }, 30000); // 30 seconds delay
+    }
+  };
 
   const translateText = async (text, targetLang) => {
     try {
@@ -244,6 +283,65 @@ export default function ResultScreen() {
             <Text style={styles.cardTitle}>{translatedContent?.whatToDoTitle || 'What to Do Next'}</Text>
           </View>
           <Text style={styles.actionText}>{translatedContent?.actionText || '1. Apply the recommended treatment immediately\n2. Monitor the affected area daily\n3. Improve drainage and air circulation\n4. Consider preventive measures for future crops\n5. Consult an agricultural expert if symptoms persist'}</Text>
+        </View>
+
+        <View style={styles.careCheckCard}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="heart" size={24} color="#4CAF50" />
+            <Text style={styles.cardTitle}>{language === 'hi' ? 'आज की देखभाल' : 'Plant Care Check'}</Text>
+          </View>
+          <Text style={styles.careSubtitle}>
+            {language === 'hi' ? 'स्कैन के बाद छोटी सी जांच' : 'Scan ke baad chhoti si jaanch'}
+          </Text>
+          
+          <View style={styles.careItems}>
+            <TouchableOpacity 
+              style={styles.careItem} 
+              onPress={() => handleCareCheck('water')}
+            >
+              <View style={[styles.checkbox, careChecklist.water && styles.checkedBox]}>
+                {careChecklist.water && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+              </View>
+              <Text style={styles.careItemText}>💧 {language === 'hi' ? 'आज पानी दिया?' : 'Water given today?'}</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.careItem} 
+              onPress={() => handleCareCheck('sunlight')}
+            >
+              <View style={[styles.checkbox, careChecklist.sunlight && styles.checkedBox]}>
+                {careChecklist.sunlight && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+              </View>
+              <Text style={styles.careItemText}>☀️ {language === 'hi' ? 'पर्याप्त धूप मिली?' : 'Received enough sunlight?'}</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.careItem} 
+              onPress={() => handleCareCheck('checked')}
+            >
+              <View style={[styles.checkbox, careChecklist.checked && styles.checkedBox]}>
+                {careChecklist.checked && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+              </View>
+              <Text style={styles.careItemText}>👀 {language === 'hi' ? 'पौधे की जांच की?' : 'Plant checked today?'}</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {!careSubmitted && (
+            <TouchableOpacity style={styles.submitButton} onPress={handleCareSubmit}>
+              <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
+              <Text style={styles.submitButtonText}>
+                {language === 'hi' ? 'जमा करें' : 'Submit'}
+              </Text>
+            </TouchableOpacity>
+          )}
+          
+          {showCareConfirmation && (
+            <View style={styles.careConfirmation}>
+              <Text style={styles.careConfirmationText}>
+                {language === 'hi' ? 'बहुत अच्छा! आपकी देखभाल सही दिशा में है 🌱' : 'Good job! Your plant care is on track 🌱'}
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.actions}>
@@ -529,6 +627,79 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: '#4CAF50',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  careCheckCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  careSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  careItems: {
+    gap: 12,
+  },
+  careItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkedBox: {
+    backgroundColor: '#4CAF50',
+    borderColor: '#4CAF50',
+  },
+  careItemText: {
+    fontSize: 16,
+    color: '#1B5E20',
+    flex: 1,
+  },
+  careConfirmation: {
+    backgroundColor: '#E8F5E8',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+  },
+  careConfirmationText: {
+    fontSize: 16,
+    color: '#2E7D32',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  submitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    gap: 8,
+  },
+  submitButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

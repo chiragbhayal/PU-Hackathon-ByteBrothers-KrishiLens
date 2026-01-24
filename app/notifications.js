@@ -3,41 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch } from 're
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useNotifications } from '../contexts/notification-context';
 
 export default function NotificationsScreen() {
   const [pushEnabled, setPushEnabled] = useState(true);
   const [scanReminders, setScanReminders] = useState(true);
   const [updateAlerts, setUpdateAlerts] = useState(true);
-
-  const notifications = [
-    {
-      id: 1,
-      title: "New Update Available!",
-      message: "KrishiLens v1.1.0 is now available with improved disease detection accuracy",
-      time: "2 hours ago",
-      type: "update",
-      icon: "download-outline",
-      unread: true
-    },
-    {
-      id: 2,
-      title: "Scan Reminder",
-      message: "Don't forget to check your tomato plants today",
-      time: "1 day ago",
-      type: "reminder",
-      icon: "time-outline",
-      unread: false
-    },
-    {
-      id: 3,
-      title: "Treatment Success",
-      message: "Your recent treatment for Early Blight was successful!",
-      time: "3 days ago",
-      type: "success",
-      icon: "checkmark-circle-outline",
-      unread: false
-    }
-  ];
+  const { notifications } = useNotifications();
 
   return (
     <LinearGradient colors={['#1B5E20', '#2E7D32', '#4CAF50']} style={styles.container}>
