@@ -1,11 +1,86 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Share } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Share, Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Speech from 'expo-speech';
+import { useLanguage } from '../contexts/language-context';
 
 export default function ResultScreen() {
   const params = useLocalSearchParams();
   const { imageUri, disease, confidence, recommendation, severity, treatment } = params;
+  const { language } = useLanguage();
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [translatedContent, setTranslatedContent] = useState(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  const translateText = async (text, targetLang) => {
+    try {
+      const response = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
+      );
+      const data = await response.json();
+      return data[0][0][0];
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text;
+    }
+  };
+
+  const handleTranslate = async () => {
+    if (isTranslating) return;
+    
+    setIsTranslating(true);
+    const targetLang = language === 'hi' ? 'en' : 'hi';
+    
+    try {
+      const textsToTranslate = [
+        disease, recommendation, treatment, severity,
+        'Analysis Result', 'Diagnosis', 'Confidence', 'Severity', 'Recommendation', 'Treatment',
+        'Why This Happens', 'What to Do Next', 'Scan Another', 'Go Home',
+        'This condition typically occurs due to environmental factors, nutrient deficiencies, or pathogen infections. Poor drainage, excessive moisture, or inadequate nutrition can create favorable conditions for disease development.',
+        '1. Apply the recommended treatment immediately\n2. Monitor the affected area daily\n3. Improve drainage and air circulation\n4. Consider preventive measures for future crops\n5. Consult an agricultural expert if symptoms persist'
+      ];
+      
+      const translations = await Promise.all(
+        textsToTranslate.map(text => translateText(text, targetLang))
+      );
+      
+      setTranslatedContent({
+        disease: translations[0],
+        recommendation: translations[1],
+        treatment: translations[2],
+        severity: translations[3],
+        analysisResult: translations[4],
+        diagnosis: translations[5],
+        confidence: translations[6],
+        severityLabel: translations[7],
+        recommendationLabel: translations[8],
+        treatmentLabel: translations[9],
+        whyTitle: translations[10],
+        whatToDoTitle: translations[11],
+        scanAnother: translations[12],
+        goHome: translations[13],
+        whyText: translations[14],
+        actionText: translations[15],
+        targetLang
+      });
+    } catch (error) {
+      Alert.alert('Translation Error', 'Failed to translate content. Please try again.');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const clearTranslation = () => {
+    setTranslatedContent(null);
+  };
+
+  const currentContent = translatedContent || {
+    disease,
+    recommendation,
+    treatment,
+    severity: severity
+  };
 
   const getConfidenceColor = (confidence) => {
     if (confidence >= 80) return '#4CAF50';
@@ -20,6 +95,31 @@ export default function ResultScreen() {
       case 'high': return '#F44336';
       default: return '#4CAF50';
     }
+  };
+
+  const speakResult = async () => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const content = translatedContent || { disease, recommendation, treatment, severity };
+    const textToSpeak = translatedContent?.targetLang === 'hi' || (!translatedContent && language === 'hi')
+      ? `रोग: ${content.disease}। विश्वास स्तर: ${confidence} प्रतिशत। गंभीरता: ${content.severity}। सिफारिश: ${content.recommendation}। उपचार: ${content.treatment}`
+      : `Disease: ${content.disease}. Confidence level: ${confidence} percent. Severity: ${content.severity}. Recommendation: ${content.recommendation}. Treatment: ${content.treatment}`;
+
+    const speechOptions = {
+      language: (translatedContent?.targetLang === 'hi' || (!translatedContent && language === 'hi')) ? 'hi-IN' : 'en-US',
+      pitch: 1.0,
+      rate: 0.8,
+      onStart: () => setIsSpeaking(true),
+      onDone: () => setIsSpeaking(false),
+      onStopped: () => setIsSpeaking(false),
+      onError: () => setIsSpeaking(false),
+    };
+
+    Speech.speak(textToSpeak, speechOptions);
   };
 
   const shareResult = async () => {
@@ -39,10 +139,30 @@ export default function ResultScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Analysis Result</Text>
-        <TouchableOpacity onPress={shareResult} style={styles.shareButton}>
-          <Ionicons name="share-outline" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
+        <Text style={styles.title}>{translatedContent?.analysisResult || 'Analysis Result'}</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity 
+            onPress={translatedContent ? clearTranslation : handleTranslate} 
+            style={[styles.translateButton, isTranslating && styles.translateButtonDisabled]}
+            disabled={isTranslating}
+          >
+            <Ionicons 
+              name={translatedContent ? "refresh" : "language"} 
+              size={20} 
+              color="#FFFFFF" 
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={speakResult} style={styles.speakButton}>
+            <Ionicons 
+              name={isSpeaking ? "stop-circle" : "volume-high"} 
+              size={20} 
+              color="#FFFFFF" 
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={shareResult} style={styles.shareButton}>
+            <Ionicons name="share-outline" size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.content}>
@@ -55,21 +175,40 @@ export default function ResultScreen() {
         <View style={styles.resultCard}>
           <View style={styles.resultHeader}>
             <Ionicons name="medical" size={32} color="#4CAF50" />
-            <Text style={styles.resultTitle}>Diagnosis</Text>
+            <Text style={styles.resultTitle}>{translatedContent?.diagnosis || 'Diagnosis'}</Text>
           </View>
           
           <View style={styles.diseaseInfo}>
-            <Text style={styles.diseaseName}>{disease}</Text>
+            <Text style={styles.diseaseName}>{currentContent.disease}</Text>
+            {translatedContent && (
+              <Text style={styles.translationNote}>
+                Translated to {translatedContent.targetLang === 'hi' ? 'Hindi' : 'English'}
+              </Text>
+            )}
             <View style={styles.confidenceContainer}>
-              <Text style={styles.confidenceLabel}>Confidence:</Text>
+              <Text style={styles.confidenceLabel}>{translatedContent?.confidence || 'Confidence'}:</Text>
               <Text style={[styles.confidenceValue, { color: getConfidenceColor(confidence) }]}>
                 {confidence}%
               </Text>
             </View>
+            
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressBarBackground}>
+                <View 
+                  style={[
+                    styles.progressBarFill, 
+                    { 
+                      width: `${confidence}%`,
+                      backgroundColor: getConfidenceColor(confidence)
+                    }
+                  ]} 
+                />
+              </View>
+            </View>
             <View style={styles.severityContainer}>
-              <Text style={styles.severityLabel}>Severity:</Text>
+              <Text style={styles.severityLabel}>{translatedContent?.severityLabel || 'Severity'}:</Text>
               <View style={[styles.severityBadge, { backgroundColor: getSeverityColor(severity) }]}>
-                <Text style={styles.severityText}>{severity}</Text>
+                <Text style={styles.severityText}>{currentContent.severity}</Text>
               </View>
             </View>
           </View>
@@ -78,33 +217,33 @@ export default function ResultScreen() {
         <View style={styles.recommendationCard}>
           <View style={styles.cardHeader}>
             <Ionicons name="bulb" size={24} color="#FF9800" />
-            <Text style={styles.cardTitle}>Recommendation</Text>
+            <Text style={styles.cardTitle}>{translatedContent?.recommendationLabel || 'Recommendation'}</Text>
           </View>
-          <Text style={styles.recommendationText}>{recommendation}</Text>
+          <Text style={styles.recommendationText}>{currentContent.recommendation}</Text>
         </View>
 
         <View style={styles.treatmentCard}>
           <View style={styles.cardHeader}>
             <Ionicons name="leaf" size={24} color="#4CAF50" />
-            <Text style={styles.cardTitle}>Treatment</Text>
+            <Text style={styles.cardTitle}>{translatedContent?.treatmentLabel || 'Treatment'}</Text>
           </View>
-          <Text style={styles.treatmentText}>{treatment}</Text>
+          <Text style={styles.treatmentText}>{currentContent.treatment}</Text>
         </View>
 
         <View style={styles.whyCard}>
           <View style={styles.cardHeader}>
             <Ionicons name="help-circle" size={24} color="#2196F3" />
-            <Text style={styles.cardTitle}>Why This Happens</Text>
+            <Text style={styles.cardTitle}>{translatedContent?.whyTitle || 'Why This Happens'}</Text>
           </View>
-          <Text style={styles.whyText}>This condition typically occurs due to environmental factors, nutrient deficiencies, or pathogen infections. Poor drainage, excessive moisture, or inadequate nutrition can create favorable conditions for disease development.</Text>
+          <Text style={styles.whyText}>{translatedContent?.whyText || 'This condition typically occurs due to environmental factors, nutrient deficiencies, or pathogen infections. Poor drainage, excessive moisture, or inadequate nutrition can create favorable conditions for disease development.'}</Text>
         </View>
 
         <View style={styles.actionCard}>
           <View style={styles.cardHeader}>
             <Ionicons name="checkmark-circle" size={24} color="#FF9800" />
-            <Text style={styles.cardTitle}>What to Do Next</Text>
+            <Text style={styles.cardTitle}>{translatedContent?.whatToDoTitle || 'What to Do Next'}</Text>
           </View>
-          <Text style={styles.actionText}>1. Apply the recommended treatment immediately{"\n"}2. Monitor the affected area daily{"\n"}3. Improve drainage and air circulation{"\n"}4. Consider preventive measures for future crops{"\n"}5. Consult an agricultural expert if symptoms persist</Text>
+          <Text style={styles.actionText}>{translatedContent?.actionText || '1. Apply the recommended treatment immediately\n2. Monitor the affected area daily\n3. Improve drainage and air circulation\n4. Consider preventive measures for future crops\n5. Consult an agricultural expert if symptoms persist'}</Text>
         </View>
 
         <View style={styles.actions}>
@@ -113,7 +252,7 @@ export default function ResultScreen() {
             onPress={() => router.push('/scan')}
           >
             <Ionicons name="camera" size={20} color="#FFFFFF" />
-            <Text style={styles.primaryButtonText}>Scan Another</Text>
+            <Text style={styles.primaryButtonText}>{translatedContent?.scanAnother || 'Scan Another'}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -121,7 +260,7 @@ export default function ResultScreen() {
             onPress={() => router.push('/(tabs)')}
           >
             <Ionicons name="home" size={20} color="#4CAF50" />
-            <Text style={styles.secondaryButtonText}>Go Home</Text>
+            <Text style={styles.secondaryButtonText}>{translatedContent?.goHome || 'Go Home'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -141,6 +280,21 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
   },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  translateButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  translateButtonDisabled: {
+    opacity: 0.5,
+  },
   backButton: {
     width: 40,
     height: 40,
@@ -149,10 +303,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  speakButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   shareButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -208,6 +370,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1B5E20',
   },
+  translationNote: {
+    fontSize: 12,
+    color: '#FF9800',
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
   confidenceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -239,6 +407,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
+  },
+  progressBarContainer: {
+    marginTop: 8,
+  },
+  progressBarBackground: {
+    height: 8,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 4,
   },
   recommendationCard: {
     backgroundColor: '#FFFFFF',

@@ -30,6 +30,33 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="ghar-kheti"
+        options={{
+          title: 'Ghar Kheti',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'nutrition' : 'nutrition-outline'} size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="marketplace"
+        options={{
+          title: 'Marketplace',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'storefront' : 'storefront-outline'} size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'settings' : 'settings-outline'} size={28} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

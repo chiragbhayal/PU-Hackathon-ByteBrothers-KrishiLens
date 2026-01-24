@@ -20,7 +20,7 @@ export default function SplashScreen() {
       } else {
         router.replace('/login');
       }
-    }, 1500);
+    }, 500);
   };
 
   if (showLanguageSelect) {
@@ -34,10 +34,7 @@ export default function SplashScreen() {
             colors={['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.1)']}
             style={styles.logoContainer}
           >
-            <Image 
-              source={require('../assets/images/icon.png')} 
-              style={styles.logo}
-            />
+            <Text style={styles.logoText}>🌱</Text>
           </LinearGradient>
           <Text style={styles.title}>KrishiLens</Text>
           <Text style={styles.tagline}>{t('tagline')}</Text>
@@ -88,10 +85,7 @@ export default function SplashScreen() {
           colors={['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.1)']}
           style={styles.logoContainer}
         >
-          <Image 
-            source={require('../assets/images/icon.png')} 
-            style={styles.logo}
-          />
+          <Text style={styles.logoText}>🌱</Text>
         </LinearGradient>
         <Text style={styles.title}>KrishiLens</Text>
         <Text style={styles.tagline}>{t('tagline')}</Text>
@@ -124,9 +118,8 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 10,
   },
-  logo: {
-    width: 90,
-    height: 90,
+  logoText: {
+    fontSize: 60,
   },
   title: {
     fontSize: 48,
@@ -180,5 +173,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1B5E20',
     letterSpacing: 1,
+    textAlign: 'center',
   },
 });

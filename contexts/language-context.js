@@ -63,7 +63,19 @@ const translations = {
     analytics: 'Analytics',
     language: 'Language',
     help: 'Help',
-    share: 'Share'
+    share: 'Share',
+    settings: 'Settings',
+    account: 'Account',
+    profile: 'Profile',
+    preferences: 'Preferences',
+    notifications: 'Notifications',
+    manageNotifications: 'Manage your notifications',
+    support: 'Support',
+    helpSupport: 'Help & Support',
+    getHelp: 'Get help and contact support',
+    about: 'About',
+    appVersionInfo: 'App version and info',
+    logout: 'Logout'
   },
   hi: {
     appName: 'KrishiLens',
@@ -125,7 +137,19 @@ const translations = {
     analytics: 'विश्लेषण',
     language: 'भाषा',
     help: 'सहायता',
-    share: 'साझा करें'
+    share: 'साझा करें',
+    settings: 'सेटिंग्स',
+    account: 'खाता',
+    profile: 'प्रोफ़ाइल',
+    preferences: 'प्राथमिकताएं',
+    notifications: 'सूचनाएं',
+    manageNotifications: 'अपनी सूचनाओं का प्रबंधन करें',
+    support: 'सहायता',
+    helpSupport: 'सहायता और समर्थन',
+    getHelp: 'सहायता प्राप्त करें और समर्थन से संपर्क करें',
+    about: 'के बारे में',
+    appVersionInfo: 'ऐप संस्करण और जानकारी',
+    logout: 'लॉग आउट'
   }
 };
 

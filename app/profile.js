@@ -12,12 +12,12 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     Alert.alert(
-      'Logout',
+      t('logout'),
       'Are you sure you want to logout?',
       [
         { text: 'Cancel', style: 'cancel' },
         { 
-          text: 'Logout', 
+          text: t('logout'), 
           style: 'destructive',
           onPress: async () => {
             await logout();
@@ -28,45 +28,6 @@ export default function ProfileScreen() {
     );
   };
 
-  const profileOptions = [
-    {
-      icon: 'person-outline',
-      title: 'Edit Profile',
-      subtitle: 'Update your personal information',
-      onPress: () => {}
-    },
-    {
-      icon: 'time-outline',
-      title: 'Scan History',
-      subtitle: 'View your previous scans',
-      onPress: () => router.push('/history')
-    },
-    {
-      icon: 'language-outline',
-      title: 'Language',
-      subtitle: 'Change app language',
-      onPress: () => router.push('/language')
-    },
-    {
-      icon: 'notifications-outline',
-      title: 'Notifications',
-      subtitle: 'Manage notification settings',
-      onPress: () => {}
-    },
-    {
-      icon: 'help-circle-outline',
-      title: 'Help & Support',
-      subtitle: 'Get help and contact support',
-      onPress: () => {}
-    },
-    {
-      icon: 'information-circle-outline',
-      title: 'About',
-      subtitle: 'App version and information',
-      onPress: () => {}
-    }
-  ];
-
   return (
     <LinearGradient 
       colors={['#1B5E20', '#2E7D32', '#4CAF50']}
@@ -76,9 +37,9 @@ export default function ProfileScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Profile</Text>
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
+        <Text style={styles.title}>{t('profile')}</Text>
+        <TouchableOpacity onPress={() => router.push('/edit-profile')} style={styles.editButton}>
+          <Ionicons name="create-outline" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 
@@ -91,23 +52,53 @@ export default function ProfileScreen() {
           <Text style={styles.userEmail}>{user?.email}</Text>
         </View>
 
-        <View style={styles.optionsSection}>
-          {profileOptions.map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.optionCard}
-              onPress={option.onPress}
-            >
-              <View style={styles.optionIcon}>
-                <Ionicons name={option.icon} size={24} color="#2E7D32" />
+        <View style={styles.infoSection}>
+          <Text style={styles.sectionTitle}>Account Information</Text>
+          
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <Ionicons name="mail-outline" size={20} color="#2E7D32" />
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Email</Text>
+                <Text style={styles.infoValue}>{user?.email}</Text>
               </View>
-              <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>{option.title}</Text>
-                <Text style={styles.optionSubtitle}>{option.subtitle}</Text>
+            </View>
+          </View>
+
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <Ionicons name="person-outline" size={20} color="#2E7D32" />
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Display Name</Text>
+                <Text style={styles.infoValue}>{user?.displayName || 'Not set'}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#81C784" />
-            </TouchableOpacity>
-          ))}
+            </View>
+          </View>
+
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <Ionicons name="call-outline" size={20} color="#2E7D32" />
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Phone Number</Text>
+                <Text style={styles.infoValue}>{user?.phoneNumber || 'Not set'}</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <Ionicons name="calendar-outline" size={20} color="#2E7D32" />
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>Member Since</Text>
+                <Text style={styles.infoValue}>
+                  {user?.metadata?.creationTime ? 
+                    new Date(user.metadata.creationTime).toLocaleDateString() : 
+                    'Unknown'
+                  }
+                </Text>
+              </View>
+            </View>
+          </View>
         </View>
 
         <TouchableOpacity style={styles.logoutCard} onPress={handleLogout}>
@@ -115,7 +106,7 @@ export default function ProfileScreen() {
             <Ionicons name="log-out-outline" size={24} color="#F44336" />
           </View>
           <View style={styles.optionContent}>
-            <Text style={[styles.optionTitle, { color: '#F44336' }]}>Logout</Text>
+            <Text style={[styles.optionTitle, { color: '#F44336' }]}>{t('logout')}</Text>
             <Text style={styles.optionSubtitle}>Sign out of your account</Text>
           </View>
         </TouchableOpacity>
@@ -149,7 +140,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: 0.5,
   },
-  logoutButton: {
+  editButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -194,16 +185,21 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
     fontWeight: '500',
   },
-  optionsSection: {
+  infoSection: {
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
-  optionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1B5E20',
+    marginBottom: 15,
+    letterSpacing: 0.3,
+  },
+  infoCard: {
     backgroundColor: 'rgba(255,255,255,0.95)',
-    padding: 16,
     borderRadius: 12,
+    padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -211,14 +207,23 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  optionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#E8F5E8',
-    justifyContent: 'center',
+  infoRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 16,
+  },
+  infoContent: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 2,
+  },
+  infoValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1B5E20',
   },
   optionContent: {
     flex: 1,
@@ -237,12 +242,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.95)',
-    padding: 16,
+    padding: 20,
     borderRadius: 12,
     marginHorizontal: 20,
+    marginTop: 20,
     marginBottom: 100,
     borderWidth: 1,
     borderColor: '#FFCDD2',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
   },
   logoutIcon: {
     width: 48,

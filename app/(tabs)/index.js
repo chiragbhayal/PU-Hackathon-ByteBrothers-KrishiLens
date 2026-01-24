@@ -1,14 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useAuth } from '../../contexts/auth-context';
 import { useLanguage } from '../../contexts/language-context';
+import { useStats } from '../../contexts/stats-context';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
+  const { stats } = useStats();
 
   const handleLogout = async () => {
     await logout();
@@ -16,10 +18,15 @@ export default function HomeScreen() {
   };
 
   return (
-    <LinearGradient 
-      colors={['#1B5E20', '#2E7D32', '#4CAF50']}
+    <ImageBackground 
+      source={require('../../assets/images/bg.jpeg')} 
       style={styles.container}
+      resizeMode="cover"
     >
+      <LinearGradient 
+        colors={['rgba(27, 94, 32, 0.7)', 'rgba(46, 125, 50, 0.7)', 'rgba(76, 175, 80, 0.7)']} 
+        style={styles.overlay}
+      >
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>{t('welcomeBack2')}</Text>
@@ -61,42 +68,40 @@ export default function HomeScreen() {
             </View>
             <Ionicons name="chevron-forward" size={24} color="#2E7D32" />
           </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.actionCard}
-            onPress={() => router.push('/dashboard')}
-          >
-            <View style={[styles.actionIcon, { backgroundColor: '#E91E63' }]}>
-              <Ionicons name="grid" size={32} color="#FFFFFF" />
-            </View>
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Dashboard</Text>
-              <Text style={styles.actionSubtitle}>View detailed analytics and tools</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={24} color="#2E7D32" />
-          </TouchableOpacity>
         </View>
 
         <View style={styles.stats}>
           <Text style={styles.sectionTitle}>{t('yourStats')}</Text>
           <View style={styles.statsGrid}>
             <View style={styles.statCard}>
-              <Text style={styles.statNumber}>0</Text>
-              <Text style={styles.statLabel}>{t('totalScans')}</Text>
+              <Text style={styles.statNumber}>{stats.totalScans}</Text>
+              <Text style={styles.statLabel}>Total Scans</Text>
             </View>
             <View style={styles.statCard}>
-              <Text style={styles.statNumber}>0</Text>
-              <Text style={styles.statLabel}>{t('thisWeek')}</Text>
+              <Text style={styles.statNumber}>{stats.healthyPlants}</Text>
+              <Text style={styles.statLabel}>Healthy Plants</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>{stats.diseasedPlants}</Text>
+              <Text style={styles.statLabel}>Diseased Plants</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statNumber}>{stats.plantsHealed}</Text>
+              <Text style={styles.statLabel}>Plants Healed</Text>
             </View>
           </View>
         </View>
        </ScrollView>
-    </LinearGradient>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  overlay: {
     flex: 1,
   },
   header: {
@@ -186,12 +191,13 @@ const styles = StyleSheet.create({
   },
   statsGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 16,
   },
   statCard: {
-    flex: 1,
+    width: '47%',
     backgroundColor: 'rgba(255,255,255,0.95)',
-    padding: 24,
+    padding: 20,
     borderRadius: 16,
     alignItems: 'center',
     shadowColor: '#000',

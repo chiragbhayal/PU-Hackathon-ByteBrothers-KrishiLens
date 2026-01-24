@@ -40,9 +40,6 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
           <View style={styles.headerContent}>
             <View style={styles.logoContainer}>
               <Ionicons name="log-in" size={32} color="#FFFFFF" />
@@ -113,14 +110,6 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 30,
     paddingHorizontal: 20,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   headerContent: {
     alignItems: 'center',

@@ -22,6 +22,10 @@ export function AuthProvider({ children }) {
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
     } catch (error) {
+      console.error('Login error:', error);
+      if (error.code === 'auth/network-request-failed') {
+        return { success: false, error: 'Network error. Check your internet connection.' };
+      }
       return { success: false, error: error.message };
     }
   };
