@@ -42,7 +42,7 @@ export default function SellCropsPage() {
               <Text style={styles.itemPrice}>{item.price}</Text>
               <Text style={styles.itemSeller}>{item.seller}</Text>
               <TouchableOpacity style={styles.buyButton}>
-                <Text style={styles.buyText}>{language === 'hi' ? 'खरीदें' : 'Buy Now'}</Text>
+                <Text style={styles.buyText}>{language === 'hi' ? 'खरीदें' : 'Sell Now'}</Text>
               </TouchableOpacity>
             </View>
           ))}

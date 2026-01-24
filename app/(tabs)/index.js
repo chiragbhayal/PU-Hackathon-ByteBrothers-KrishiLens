@@ -37,37 +37,55 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.quickActions}>
           <Text style={styles.sectionTitle}>{t('quickActions')}</Text>
           
-          <TouchableOpacity 
-            style={styles.actionCard}
-            onPress={() => router.push('/crop-selection')}
-          >
-            <View style={[styles.actionIcon, { backgroundColor: '#FF5722' }]}>
-              <Ionicons name="camera" size={32} color="#FFFFFF" />
-            </View>
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>{t('scanCrop')}</Text>
-              <Text style={styles.actionSubtitle}>{t('scanCropDesc')}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={24} color="#2E7D32" />
-          </TouchableOpacity>
+          <View style={styles.actionGrid}>
+            <TouchableOpacity 
+              style={styles.squareActionCard}
+              onPress={() => router.push('/crop-selection')}
+            >
+              <View style={[styles.squareActionIcon, { backgroundColor: '#FF5722' }]}>
+                <Ionicons name="camera" size={32} color="#FFFFFF" />
+              </View>
+              <Text style={styles.squareActionTitle}>{t('scanCrop')}</Text>
+              <Text style={styles.squareActionSubtitle}>{t('scanCropDesc')}</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.actionCard}
-            onPress={() => router.push('/history')}
-          >
-            <View style={[styles.actionIcon, { backgroundColor: '#FF9800' }]}>
-              <Ionicons name="time" size={32} color="#FFFFFF" />
-            </View>
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>{t('scanHistory')}</Text>
-              <Text style={styles.actionSubtitle}>{t('scanHistoryDesc')}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={24} color="#2E7D32" />
-          </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.squareActionCard}
+              onPress={() => router.push('/history')}
+            >
+              <View style={[styles.squareActionIcon, { backgroundColor: '#FF9800' }]}>
+                <Ionicons name="time" size={32} color="#FFFFFF" />
+              </View>
+              <Text style={styles.squareActionTitle}>{t('scanHistory')}</Text>
+              <Text style={styles.squareActionSubtitle}>{t('scanHistoryDesc')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.squareActionCard}
+              onPress={() => router.push('/land-rent')}
+            >
+              <View style={[styles.squareActionIcon, { backgroundColor: '#795548' }]}>
+                <Ionicons name="map-outline" size={32} color="#FFFFFF" />
+              </View>
+              <Text style={styles.squareActionTitle}>{language === 'hi' ? 'जमीन किराये पर' : 'Land Rent'}</Text>
+              <Text style={styles.squareActionSubtitle}>{language === 'hi' ? 'किराये पर' : 'Rent'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.squareActionCard}
+              onPress={() => router.push('/schemes')}
+            >
+              <View style={[styles.squareActionIcon, { backgroundColor: '#9C27B0' }]}>
+                <Ionicons name="library-outline" size={32} color="#FFFFFF" />
+              </View>
+              <Text style={styles.squareActionTitle}>{language === 'hi' ? 'योजनाएं' : 'Schemes'}</Text>
+              <Text style={styles.squareActionSubtitle}>{language === 'hi' ? 'योजनाएं' : 'Schemes'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.stats}>
@@ -134,6 +152,9 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
+  contentContainer: {
+    paddingBottom: 100,
+  },
   quickActions: {
     padding: 20,
   },
@@ -143,6 +164,52 @@ const styles = StyleSheet.create({
     color: '#1B5E20',
     marginBottom: 20,
     letterSpacing: 0.5,
+  },
+  actionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+    justifyContent: 'space-between',
+  },
+  squareActionCard: {
+    width: '47%',
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  squareActionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#2E7D32',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  squareActionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1B5E20',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
+  squareActionSubtitle: {
+    fontSize: 12,
+    color: '#4CAF50',
+    marginTop: 4,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   actionCard: {
     flexDirection: 'row',
