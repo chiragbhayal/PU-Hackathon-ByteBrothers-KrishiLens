@@ -52,6 +52,16 @@ export default function FertilizersPage() {
               </View>
             </View>
           ))}
+          
+          <View style={styles.infoCard}>
+            <Ionicons name="information-circle-outline" size={24} color="#2196F3" />
+            <Text style={styles.infoText}>
+              {language === 'hi' ? 
+                'उर्वरक और कीटनाशक का उपयोग करते समय सुरक्षा दिशानिर्देशों का पालन करें' :
+                'Always follow safety guidelines when using fertilizers and pesticides'
+              }
+            </Text>
+          </View>
         </ScrollView>
       </LinearGradient>
     </ImageBackground>
@@ -72,5 +82,21 @@ const styles = StyleSheet.create({
   itemPrice: { fontSize: 16, color: '#2196F3', marginTop: 4 },
   itemSeller: { fontSize: 14, color: '#666', marginTop: 4 },
   buyButton: { backgroundColor: '#2196F3', padding: 10, borderRadius: 8, marginTop: 10, alignItems: 'center' },
-  buyText: { color: '#FFFFFF', fontWeight: 'bold' }
+  buyText: { color: '#FFFFFF', fontWeight: 'bold' },
+  infoCard: {
+    flexDirection: 'row',
+    backgroundColor: '#E3F2FD',
+    padding: 16,
+    marginTop: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#BBDEFB',
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#1976D2',
+    marginLeft: 12,
+    lineHeight: 20,
+  },
 });

@@ -46,6 +46,12 @@ export default function MarketplaceScreen() {
       title: language === 'hi' ? 'फसल बेचें' : 'Sell Crops',
       desc: language === 'hi' ? 'अपनी फसल को बेहतर दाम पर बेचें' : 'Sell your crops at better prices',
       color: '#E91E63'
+    },
+    {
+      icon: 'megaphone-outline',
+      title: language === 'hi' ? 'अभियान' : 'Campaigns',
+      desc: language === 'hi' ? 'कृषि अभियान और कार्यक्रम' : 'Agricultural campaigns and events',
+      color: '#673AB7'
     }
   ];
 
@@ -87,6 +93,7 @@ export default function MarketplaceScreen() {
                   else if (index === 3) router.push('/land-rent');
                   else if (index === 4) router.push('/schemes');
                   else if (index === 5) router.push('/sell-crops');
+                  else if (index === 6) router.push('/campaigns');
                 }}
               >
                 <View style={[styles.itemIcon, { backgroundColor: item.color }]}>
