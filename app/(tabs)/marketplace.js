@@ -36,9 +36,9 @@ export default function MarketplaceScreen() {
       color: '#795548'
     },
     {
-      icon: 'document-text-outline',
-      title: language === 'hi' ? 'सरकारी योजनाएं' : 'Government Schemes',
-      desc: language === 'hi' ? 'किसानों के लिए सरकारी योजनाएं' : 'Government schemes for farmers',
+      icon: 'library-outline',
+      title: language === 'hi' ? 'योजनाएं' : 'Schemes',
+      desc: language === 'hi' ? 'सरकारी योजनाएं और सब्सिडी' : 'Government schemes and subsidies',
       color: '#9C27B0'
     },
     {
@@ -85,7 +85,7 @@ export default function MarketplaceScreen() {
                   else if (index === 1) router.push('/tools');
                   else if (index === 2) router.push('/fertilizers');
                   else if (index === 3) router.push('/land-rent');
-                  else if (index === 4) router.push('/government-schemes');
+                  else if (index === 4) router.push('/schemes');
                   else if (index === 5) router.push('/sell-crops');
                 }}
               >

@@ -123,23 +123,13 @@ export default function HistoryScreen() {
                   <Text style={styles.scanDisease}>
                     {scan.result?.disease || 'Analysis Complete'}
                   </Text>
-                  <Text style={styles.scanTime}>
-                    {getTimeAgo(scan.timestamp)}
-                  </Text>
-                  <View style={styles.scanDetails}>
-                    <View style={styles.confidenceContainer}>
-                      <Text style={styles.confidenceText}>
-                        {scan.result?.confidence}% confidence
-                      </Text>
-                    </View>
-                    <View style={[
-                      styles.severityBadge, 
-                      { backgroundColor: getSeverityColor(scan.result?.severity) }
-                    ]}>
-                      <Text style={styles.severityText}>
-                        {scan.result?.severity || 'Low'}
-                      </Text>
-                    </View>
+                  <View style={styles.scanMeta}>
+                    <Text style={styles.scanTime}>
+                      {getTimeAgo(scan.timestamp)}
+                    </Text>
+                    <Text style={styles.confidenceText}>
+                      {scan.result?.confidence}%
+                    </Text>
                   </View>
                 </View>
                 
@@ -261,35 +251,18 @@ const styles = StyleSheet.create({
     color: '#1B5E20',
     marginBottom: 4,
   },
+  scanMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   scanTime: {
     fontSize: 14,
-    color: '#4CAF50',
-    marginBottom: 8,
-  },
-  scanDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  confidenceContainer: {
-    backgroundColor: '#E8F5E8',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    color: '#666',
   },
   confidenceText: {
-    fontSize: 12,
-    color: '#2E7D32',
-    fontWeight: '600',
-  },
-  severityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  severityText: {
-    fontSize: 12,
-    color: '#FFFFFF',
+    fontSize: 14,
+    color: '#4CAF50',
     fontWeight: '600',
   },
 });

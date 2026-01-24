@@ -207,6 +207,29 @@ export default function ScanScreen() {
         };
         updateStats(scanResult);
         
+        // Save mock result to Firestore too
+        addDoc(collection(db, 'scans'), {
+          userId: user.uid,
+          userEmail: user.email,
+          imageUri: selectedImage,
+          result: {
+            disease: mockResult.disease,
+            confidence: mockResult.confidence,
+            recommendation: mockResult.recommendation,
+            severity: mockResult.severity,
+            treatment: mockResult.treatment,
+            why: language === 'hi' ? 
+              'यह स्थिति आमतौर पर पर्यावरणीय कारकों, पोषक तत्वों की कमी, या रोगजनक संक्रमण के कारण होती है।' :
+              'This condition typically occurs due to environmental factors, nutrient deficiencies, or pathogen infections.',
+            whatToDo: language === 'hi' ?
+              '1. तुरंत सुझाए गए उपचार को लागू करें\n2. प्रभावित क्षेत्र की दैनिक निगरानी करें\n3. जल निकासी और हवा के संचार में सुधार करें\n4. निवारक उपायों पर विचार करें\n5. यदि आवश्यक हो तो कृषि विशेषज्ञ से सलाह लें' :
+              '1. Apply recommended treatment immediately\n2. Monitor affected area daily\n3. Improve drainage and air circulation\n4. Consider preventive measures\n5. Consult agricultural expert if needed'
+          },
+          timestamp: new Date(),
+          scanId: Date.now().toString(),
+          language: language
+        }).catch(error => console.log('Background save error:', error));
+        
         router.push({
           pathname: '/result',
           params: {
