@@ -1,12 +1,32 @@
 # KrishiLens
 
-## Team Information
+## Project Information
 
-### Team Members:
-1. Chirag Bhayal - Project Lead
-2. Member Two - Role
-3. Member Three - Role
-4. Member Four - Role
+### Team Members
+- Chirag Bhayal
+- [Other Team Member Names]
 
-### Project Overview:
-KrishiLens is a project aimed at enhancing agricultural practices through technology. It leverages advanced features to provide solutions for farmers, enabling better crop management and yield optimization.
+### Features
+- Feature 1: Description
+- Feature 2: Description
+- Feature 3: Description
+
+### Architecture
+- Overview of architecture
+
+### Technologies
+- Tech 1
+- Tech 2
+- Tech 3
+
+### Project Details
+- Comprehensive details about the project.
+
+## Usage
+- Instructions on how to use the project.
+
+## Contributing
+- Guidelines for contributing to the project.
+
+## License
+- Information about the project's license.
